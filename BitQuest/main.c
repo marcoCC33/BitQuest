@@ -1,7 +1,7 @@
 /*
     MAIN.C
-        - FUNCIÓN PRINCIPAL
-        - MENÚ INICIAL
+        - FUNCIÃ“N PRINCIPAL
+        - MENÃš INICIAL
         - CONTROL GENERAL DEL JUEGO
 */
 
@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Definición de códigos de color ANSI para la consola
+// DefiniciÃ³n de cÃ³digos de color ANSI para la consola
 #define RESET       "\x1b[0m"
 #define NEGRO        "\x1b[30m"
 #define RED         "\x1b[31m"
@@ -39,13 +39,13 @@ int main() {
         // Limpiar la consola (Comando de Windows)
         system("cls");
 
-        // Título y Subtítulo con colores
-        printf(CYAN "========================================\n");
-        printf("               BIT  QUEST               \n");
-        printf("========================================\n" RESET);
-        printf(YELLOW ">Hecho por Juan, Alejandro y Marco (JAM)\n\n" RESET);
+        // TÃ­tulo y SubtÃ­tulo con colores
+        printf(CYAN "==================================================\n");
+        printf("                    BIT  QUEST                    \n");
+        printf("==================================================\n" RESET);
+        printf(YELLOW ">Hecho por Juan, Rodrigo, Alejandro y Marco (JRAM)\n\n" RESET);
 
-        // Menú de 4 opciones
+        // MenÃº de 4 opciones
         printf(VERDE "[1]" RESET " JUGAR\n");
         printf(VERDE "[2]" RESET " OP2\n");
         printf(VERDE "[3]" RESET " ACERCA DEL JUEGO\n");
@@ -55,21 +55,21 @@ int main() {
 
         // Leer la entrada del usuario
         if (scanf("%d", &opcion) != 1) {
-            // Limpiar el buffer si el usuario ingresa una letra en lugar de un número
+            // Limpiar el buffer si el usuario ingresa una letra en lugar de un nÃºmero
             while (getchar() != '\n');
             opcion = 0;
         }
 
         printf(RESET "\n");
 
-        // Evaluar la opción seleccionada
+        // Evaluar la opciÃ³n seleccionada
         switch (opcion) {
         case 1:
             printf(CYAN "CARGANDO JUEGO...\n" RESET);
             system("pause"); // Pausar para que el usuario pueda leer el mensaje
             break;
         case 2:
-            printf(CYAN "Has seleccionado la Opción 2\n" RESET);
+            printf(CYAN "Has seleccionado la OpciÃ³n 2\n" RESET);
             system("pause");
             break;
         case 3:
@@ -79,8 +79,8 @@ int main() {
             system("pause");
             break;
         case 4:
-            printf(YELLOW "GRACIAS POR JUGAR!\n- JAM\n" RESET);
-            // No hay pause aquí para que el programa termine directamente
+            printf(YELLOW "GRACIAS POR JUGAR!\n- JRAM\n" RESET);
+            // No hay pause aquÃ­ para que el programa termine directamente
             break;
         default:
             printf(ROJO "> OPCION INVALIDA,\n  SELECCIONA DEL 1 AL 4 y DA ENTER.\n\n" RESET);
@@ -93,13 +93,13 @@ int main() {
     return 0;
 }
 
-// Función para imprimir información
+// FunciÃ³n para imprimir informaciÃ³n
 void imprimir_acercade_1() {
     // Limpiar pantalla (Windows)
     system("cls");
     
-    // Título
-    printf(CYAN "====================================================\n\tACERCA DE BIT QUEST"YELLOW " Programado por JAM" CYAN "\n===========================================");
+    // TÃ­tulo
+    printf(CYAN "====================================================\n\tACERCA DE BIT QUEST"YELLOW " Programado por JRAM" CYAN "\n===========================================");
     printf(NEGRO B_WHITE "PARTE 1/2\n" RESET);
 
     // Instrucciones de movimiento
@@ -114,7 +114,7 @@ void imprimir_acercade_1() {
     printf("\n" MORADO "OBJETIVO:" YELLOW " Recorrer el mapa, recolectar monedas,\n encontrar la llave y llegar a la salida.\n" RESET);
     printf("\n" MORADO "ELEMENTOS DEL MAPA:\n" GREEN "[SIMBOLO]" MORADO ":" RESET " SIGNIFICADO.\n");
 
-    // Simbología del juego
+    // SimbologÃ­a del juego
     printf("\n" VERDE "[" AZUL_B "#" VERDE "]" MORADO ":" RESET " Pared, no se puede pasar.");
     printf("\n" VERDE "[" GRIS "." VERDE "]" MORADO ":" RESET " Camino libre, transitable.");
     printf("\n" VERDE "[" WHITE "P" VERDE "]" MORADO ":" RESET " Personaje.");
@@ -128,11 +128,11 @@ void imprimir_acercade_2(){
     // Limpiar pantalla (Windows)
     system("cls");
 
-    // Título
-    printf(CYAN "====================================================\n\tACERCA DE BIT QUEST"YELLOW " Programado por JAM" CYAN "\n===========================================");
+    // TÃ­tulo
+    printf(CYAN "====================================================\n\tACERCA DE BIT QUEST"YELLOW " Programado por JRAM" CYAN "\n===========================================");
     printf(NEGRO B_WHITE "PARTE 2/2\n" RESET);
 
-    // Explicación niveles
+    // ExplicaciÃ³n niveles
     printf("\n" MORADO "NIVELES:\n" VERDE "[NIVEL #]" MORADO ":" RESET " Descripcion del nivel.\n");
     printf("\n" VERDE "[Nivel 1]" MORADO ":" RESET " Laberinto sencillo, no hay dificultad.");
     printf("\n" VERDE "[Nivel 2]" MORADO ":" RESET " Mas caminos y monedas, intermedio.");
