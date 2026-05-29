@@ -55,8 +55,9 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
 
     for (int x = min_x; x < max_x; x++) {
         for (int y = min_y; y < max_y; y++) {
-            printf(_LIMPIAR);
-            switch (toupper(mapa[x][y])) {
+            color_rgb(255, 255, 255);
+            fondo_rgb(0, 0, 0);
+            switch (mapa[x][y]) {
             case '#':
                 color_rgb(255, 255, 255);
                 printf("%c%c", 219, 219);
@@ -72,29 +73,32 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
 
             case 'M':
                 color_rgb(192, 128, 32);
-                printf("%c ", 184);
+                printf("$ ", 184);
                 break;
 
             case 'K':
-                color_rgb(96, 96, 112);
+                color_rgb(192, 192, 224);
                 printf("O%c", 170);
                 break;
 
             case 'D':
-                color_rgb(0, 0, 0);
-                fondo_rgb(96, 96, 112);
-                printf("%c%c", 204, 185);
+                color_rgb(255, 170, 90);
+                fondo_rgb(175, 95, 20);
+                printf(" %c", 170);
                 break;
 
             case 'E':
                 color_rgb(0, 0, 0);
-                fondo_rgb(64, 255, 192);
+                fondo_rgb(250, 55, 15);
                 printf("[]");
+                break;
+
+            case '\0':
+                printf("");
                 break;
 
             default:
                 color_rgb(255, 0, 255);
-                fondo_rgb(0, 255, 0);
                 printf("ER");
                 break;
             }
@@ -115,4 +119,9 @@ Jugador encontrar_jugador(char** mapa, int ren, int col) {
             }
         }
     }
+
+    new_jugador.x = 0;
+    new_jugador.y = 0;
+
+    return new_jugador;
 }
