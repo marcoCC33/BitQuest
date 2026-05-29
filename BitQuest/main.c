@@ -8,6 +8,9 @@
 #define _CRT_SECURE_NO_WARNINGS // Para omitir las advertencias de scanf inseguro o unsafe
 #include <stdio.h>
 #include <stdlib.h>
+#include "mapas.h"
+#include "juego.h"
+#include "juego.c"
 
 //---------- Definición de Input para evitar usar ENTER - para Windows, Linux y con suerte Mac ---------//
 #ifdef _WIN32
@@ -63,55 +66,18 @@
     }
 #endif
 
-// Definición de códigos de color ANSI para la consola
-#define RESET       "\x1b[0m"
-#define NEGRO        "\x1b[30m"
-#define RED         "\x1b[31m"
-#define GREEN       "\x1b[32m"
-#define YELLOW      "\x1b[33m"
-#define BLUE        "\x1b[34m"
-#define PURPLE      "\x1b[35m"
-#define CYAN        "\x1b[36m"
-#define WHITE        "\x1b[37m"
-#define GRIS        "\x1b[90m"
-#define ROJO        "\x1b[91m"
-#define VERDE       "\x1b[92m"
-#define YELLOW_B    "\x1b[93m"
-#define AZUL        "\x1b[94m"
-#define MORADO      "\x1b[95m"
-#define AZUL_B      "\x1b[96m"
-#define B_WHITE     "\x1b[47m"
-
 #define pausa()   printf("Presiona una tecla para continuar... "); _getch()
 
-#define _LIMPIAR    "\x1b[2J\x1b[H"
-
-//Definiciones para jugar con la consola de CUALQUIER LADO
-#define _CONSOLA(ordenes) "\x1b[" #ordenes
-#define _RGB(r, g, b) "\x1b[38;2;"#r";"#g";"#b"m"
-#define _FRGB(r, g, b) "\x1b[48;2;"#r";"#g";"#b"m"
-    
-//Funciones para jugar con el color del texto en consola
-void color_rgb(int r, int g, int b) {
-    //Decide dibujar un color[38], luego especifica su rango[2] y su RGB
-    printf("\x1b[38;2;%d;%d;%dm", r, g, b);
-}
-
-void fondo_rgb(int r, int g, int b) {
-    //Decide dibujar un fondo[48], luego especifica su rango[2] y su RGB
-    printf("\x1b[48;2;%d;%d;%dm", r, g, b);
-}
-
-void ajustar_cursor(int x, int y) {
-    printf("\x1b[%d;%dH", x, y);
-}
 
 void imprimir_acercade_1();
 void imprimir_acercade_2();
 // void menu();
 
 int main() {
+    Jugador j;
     int opcion;
+
+    j = encontrar_jugador(mapa, 60, 60);
 
     do {
         // Limpieza de consola
@@ -141,6 +107,7 @@ int main() {
         case 1:
             //Por qué cargaría un juego rancio de consola que pesa como 3 kilobytes???
             printf(CYAN "CARGANDO JUEGO...\n" RESET);
+            dibujar_mapa(mapa, 60, 60, j);
             espera(3000);
             break;
         case 2:
