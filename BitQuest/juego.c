@@ -53,6 +53,7 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
         max_y = j.y + MAX_VISIBLE_Y / 2;
     }
 
+
     for (int x = min_x; x < max_x; x++) {
         for (int y = min_y; y < max_y; y++) {
             color_rgb(255, 255, 255);
@@ -105,6 +106,45 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
         }
         printf("\n");
     }
+}
+
+void dibujar_informacion(Jugador j, int max_coins) {
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf(_CONSOLA(3m) "  $ ");
+    //Dibujar monedas sin romper el diseño
+    if (j.monedas < 10)         printf("  %d", j.monedas);
+    else if (j.monedas < 100)   printf(" %d", j.monedas);
+    else                        printf("%d", j.monedas);
+    printf("/");
+    if (max_coins < 10)         printf("  %d", max_coins);
+    else if (max_coins < 100)   printf(" %d", max_coins);
+    else                        printf("%d", max_coins);
+
+    printf(" - POS ");
+    //Dibujar posición sin romper el diseño
+    //en x
+    if (j.x < 10)         printf("  %d", j.x);
+    else if (j.x < 100)   printf(" %d", j.x);
+    else                  printf("%d", j.x);
+    printf(", ");
+    //en y
+    if (j.y < 10)         printf("  %d", j.y);
+    else if (j.y < 100)   printf(" %d", j.y);
+    else                  printf("%d", j.y);
+    printf(" - O%c ", 170);
+    for (int i = 7 - j.llaves; i > 0; i--) {
+        printf(" ");
+    }
+    for (int i = j.llaves > 7 ? 7: j.llaves; i > 0; i--) {
+        if (j.llaves > 7 && i == 7) {
+            printf("+");
+        }
+        else {
+            printf("|");
+        }
+    }
+    printf(" \n" RESET);
 }
 
 Jugador encontrar_jugador(char** mapa, int ren, int col) {

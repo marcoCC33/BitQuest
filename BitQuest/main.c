@@ -108,7 +108,7 @@ int main() {
         case 1:
             //Por qué cargaría un juego rancio de consola que pesa como 3 kilobytes???
             mapa_cargado = cargar_mapa(&ren, &col, "mapas/Nivel1.txt");
-            printf("\e[?25l" _LIMPIAR);
+            printf(_LIMPIAR "\e[?25l");
             if (mapa_cargado != NULL) {
                 bool completado = false;
 
@@ -117,12 +117,14 @@ int main() {
                     if (_kbhit()) {
                         char c = tolower(_getch());
                         switch (c) {
+                        case 'p': printf(_LIMPIAR); break;
                         default: printf("%c", c); break;
                         }
                     }
 
                     //Dibujar
                     ajustar_cursor(1, 1);
+                    dibujar_informacion(j, 10);
                     dibujar_mapa(mapa_cargado, ren, col, j);
                     espera(500);
                 }
