@@ -24,7 +24,7 @@
 #define B_WHITE     "\x1b[47m"
 
 //Definiciones para jugar con la consola de CUALQUIER LADO
-#define _LIMPIAR    "\x1b[2J\x1b[H"
+#define _LIMPIAR    "\ec\e[?25l"
 #define _CONSOLA(ordenes) "\x1b[" #ordenes
 #define _RGB(r, g, b) "\x1b[38;2;"#r";"#g";"#b"m"
 #define _FRGB(r, g, b) "\x1b[48;2;"#r";"#g";"#b"m"

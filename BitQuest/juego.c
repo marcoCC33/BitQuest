@@ -53,10 +53,25 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
         max_y = j.y + MAX_VISIBLE_Y / 2;
     }
 
+    //Marcos tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 201);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 187);
+
     for (int x = min_x; x < max_x; x++) {
+        //Marco izquierdo
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+
         for (int y = min_y; y < max_y; y++) {
-            printf(_LIMPIAR);
-            switch (toupper(mapa[x][y])) {
+            color_rgb(255, 255, 255);
+            fondo_rgb(0, 0, 0);
+            switch (mapa[x][y]) {
             case '#':
                 color_rgb(255, 255, 255);
                 printf("%c%c", 219, 219);
@@ -72,35 +87,106 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
 
             case 'M':
                 color_rgb(192, 128, 32);
-                printf("%c ", 184);
+                printf("$ ", 184);
                 break;
 
             case 'K':
-                color_rgb(96, 96, 112);
+                color_rgb(192, 192, 224);
                 printf("O%c", 170);
                 break;
 
             case 'D':
-                color_rgb(0, 0, 0);
-                fondo_rgb(96, 96, 112);
-                printf("%c%c", 204, 185);
+                color_rgb(255, 170, 90);
+                fondo_rgb(175, 95, 20);
+                printf(" %c", 170);
                 break;
 
             case 'E':
                 color_rgb(0, 0, 0);
-                fondo_rgb(64, 255, 192);
+                fondo_rgb(250, 55, 15);
                 printf("[]");
+                break;
+
+            case '\0':
+                printf("");
                 break;
 
             default:
                 color_rgb(255, 0, 255);
-                fondo_rgb(0, 255, 0);
                 printf("ER");
                 break;
             }
         }
+        //Marco derecho
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+        //Salto de línea sin dibujar de más
+        color_rgb(255, 255, 255);
+        fondo_rgb(0, 0, 0);
         printf("\n");
     }
+
+    //Marco inf tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 200);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 188);
+}
+
+void dibujar_informacion(Jugador j, int max_coins) {
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf(_CONSOLA(3m) " $ ");
+    //Dibujar monedas sin romper el diseño
+    if (j.monedas < 10)         printf("   %d", j.monedas);
+    else if (j.monedas < 100)   printf("  %d", j.monedas);
+    else if (j.monedas < 1000)  printf(" %d", j.monedas);
+    else                        printf("%d", j.monedas);
+    printf("/");
+    if (max_coins < 10)         printf("   %d", max_coins);
+    else if (max_coins < 100)   printf("  %d", max_coins);
+    else if (max_coins < 1000)  printf(" %d", max_coins);
+    else                        printf("%d", max_coins);
+
+    printf(" %c POS ", 175);
+    //Dibujar posición sin romper el diseño
+    //en x
+    if (j.x < 10)         printf("  %d", j.x);
+    else if (j.x < 100)   printf(" %d", j.x);
+    else                  printf("%d", j.x);
+    printf(", ");
+    //en y
+    if (j.y < 10)         printf("  %d", j.y);
+    else if (j.y < 100)   printf(" %d", j.y);
+    else                  printf("%d", j.y);
+    printf(" %c ", 174);
+    //Dibujar las llaves
+    for (int i = j.llaves > 5 ? 5: j.llaves; i > 0; i--) {
+        printf("O%c", 170);
+
+        //Último caracter, si son más llaves, se pone un +
+        if (i == 1) {
+            if (j.llaves > 5) {
+                printf("+");
+            }
+            else {
+                printf(" ");
+            }
+        }
+    }
+    //Espacio extra, de todas formas
+    if (j.llaves == 0) {
+        printf(" ");
+    }
+    //Espacios de llaves extra
+    for (int i = 5 - j.llaves; i > 0; i--) {
+        printf("  ");
+    }
+    printf(" \n" RESET);
 }
 
 Jugador encontrar_jugador(char** mapa, int ren, int col) {
@@ -115,4 +201,9 @@ Jugador encontrar_jugador(char** mapa, int ren, int col) {
             }
         }
     }
+
+    new_jugador.x = 0;
+    new_jugador.y = 0;
+
+    return new_jugador;
 }

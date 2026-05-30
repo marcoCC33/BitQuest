@@ -8,9 +8,9 @@
 #define _CRT_SECURE_NO_WARNINGS // Para omitir las advertencias de scanf inseguro o unsafe
 #include <stdio.h>
 #include <stdlib.h>
-#include "mapas.h"
 #include "juego.h"
 #include "juego.c"
+#include "mapas.h"
 
 //---------- Definición de Input para evitar usar ENTER - para Windows, Linux y con suerte Mac ---------//
 #ifdef _WIN32
@@ -68,7 +68,6 @@
 
 #define pausa()   printf("Presiona una tecla para continuar... "); _getch()
 
-
 void imprimir_acercade_1();
 void imprimir_acercade_2();
 // void menu();
@@ -76,8 +75,10 @@ void imprimir_acercade_2();
 int main() {
     Jugador j;
     int opcion;
+    int ren = 0, col = 0;
+    char** mapa_cargado = NULL;
 
-    j = encontrar_jugador(mapa, 60, 60);
+    j.x = j.y = j.monedas = j.cant_pasos = j.llaves = 0;
 
     do {
         // Limpieza de consola
@@ -106,8 +107,31 @@ int main() {
         switch (opcion) {
         case 1:
             //Por qué cargaría un juego rancio de consola que pesa como 3 kilobytes???
-            printf(CYAN "CARGANDO JUEGO...\n" RESET);
-            dibujar_mapa(mapa, 60, 60, j);
+            mapa_cargado = cargar_mapa(&ren, &col, "mapas/Nivel1.txt");
+            printf(_LIMPIAR "\e[?25l");
+            if (mapa_cargado != NULL) {
+                bool completado = false;
+
+                while (!completado) {
+                    //Detectar entrada del teclado
+                    if (_kbhit()) {
+                        char c = tolower(_getch());
+                        switch (c) {
+                        case 'p': printf(_LIMPIAR); break;
+                        default: printf("%c", c); break;
+                        }
+                    }
+
+                    //Dibujar
+                    ajustar_cursor(1, 1);
+                    dibujar_informacion(j, 10);
+                    dibujar_mapa(mapa_cargado, ren, col, j);
+                    espera(500);
+                }
+            }
+            else {
+                printf("ERROR\n");
+            }
             espera(3000);
             break;
         case 2:
@@ -131,6 +155,11 @@ int main() {
         }
 
     } while (opcion != 4); // El bucle se repite hasta que el usuario elija 4
+
+    for (int x = 0; x < ren; x++) {
+        free(mapa_cargado[x]);
+    }
+    free(mapa_cargado);
 
     return 0;
 }
