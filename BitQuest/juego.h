@@ -4,7 +4,7 @@
 #define MAX_VISIBLE_X 20
 #define MAX_VISIBLE_Y 20
 
-// Definición de códigos de color ANSI para la consola
+// DefiniciÃ³n de cÃ³digos de color ANSI para la consola
 #define RESET       "\x1b[0m"
 #define NEGRO        "\x1b[30m"
 #define RED         "\x1b[31m"
@@ -40,15 +40,15 @@ void dibujar_informacion(Jugador, int);
 void dibujar_mapa(char**, int, int, Jugador);
 
 Jugador encontrar_jugador(char**, int, int);
-void mover_jugador(char*, int, int, int, int);			//Podría ser en asm (movería al player)
-int verificar_jugador(char*, int, int, int);			//ASM (verificaría la posición del jugador y si es válida)
-int nivel_completado(char*, int, int);					//Podría ser en asm (verificaría si el jugador llegó a la salida)
-int cantidad_caracter(char*, int, int);					//ASM (devolvería la cantidad de 'caracter' en el mapa)
-int calcular_puntuaje(int, int, int);					//ASM
-int verificar_objeto(char*, int, int, int, int);		//ASM
-int celdas_libres(char*, int);							//ASM
+void mover_jugador(char*, int, int, int, int);			//PodrÃ­a ser en asm (moverÃ­a al player)
+int verificar_jugador(char*, int, int, int);			// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
+int nivel_completado(char*, int, int);					// PodrÃ­a ser en asm (verificarÃ­a si el jugador llegÃ³ a la salida)
+int cantidad_caracter(char*, int, int, int);		    // ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
+int calcular_puntuaje(int, int, int);					// ASM (monedas, pasos, niveles) - regresa puntuaciÃ³n final
+int verificar_objeto(char*, int, int, int, int);		// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
+int celdas_libres(char*, int, int);						// ASM (mapa, ren, col) - regresa cuantos '.' hay
 
-//Dibujado etcétera
+//Dibujado etcÃ©tera
 void color_rgb(int, int, int);
 void fondo_rgb(int, int, int);
 void ajustar_cursor(int, int);
