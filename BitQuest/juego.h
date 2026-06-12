@@ -4,7 +4,7 @@
 #define MAX_VISIBLE_X 20
 #define MAX_VISIBLE_Y 20
 
-// Definici√≥n de c√≥digos de color ANSI para la consola
+// DefiniciÛn de cÛdigos de color ANSI para la consola
 #define RESET       "\x1b[0m"
 #define NEGRO        "\x1b[30m"
 #define RED         "\x1b[31m"
@@ -40,15 +40,17 @@ void dibujar_informacion(Jugador, int);
 void dibujar_mapa(char**, int, int, Jugador);
 
 Jugador encontrar_jugador(char**, int, int);
-void mover_jugador(char*, int, int, int, int);			//Podr√≠a ser en asm (mover√≠a al player)
-int verificar_jugador(char*, int, int, int);			// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
-int nivel_completado(char*, int, int);					// Podr√≠a ser en asm (verificar√≠a si el jugador lleg√≥ a la salida)
-int cantidad_caracter(char*, int, int, int);		    // ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
-int calcular_puntuaje(int, int, int);					// ASM (monedas, pasos, niveles) - regresa puntuaci√≥n final
-int verificar_objeto(char*, int, int, int, int);		// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
-int celdas_libres(char*, int, int);						// ASM (mapa, ren, col) - regresa cuantos '.' hay
+// funciones para  rutinas.ASM
+int verificar_jugador(char*, int max_col, int x, int y);						// Verifica la posicion propuesta de movimiento y retorna un 1 si es valida o un 0 si no
+int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y);	//PodrÌa ser en asm (verificarÌa si el jugador llegÛ a la salida)
+int cantidad_caracter(char*, int, int);											//ASM (devolverÌa la cantidad de 'caracter' en el mapa)
+int calcular_puntuaje(int, int, int);											//ASM
+int verificar_objeto(char*, int, int, int, int);								// Devuelve un 1 si est· el objeto o un 0 si no est·, verifica si existe un determinado objeto
+int celdas_libres(char*, int);													//ASM
+void encontrar_salida(char*, int*, int*, int, int);
+void mover_jugador(char* mapa, int x1, int y1, int x2, int y2);				//(moverÌa al player)
 
-//Dibujado etc√©tera
+//Dibujado etcÈtera
 void color_rgb(int, int, int);
 void fondo_rgb(int, int, int);
 void ajustar_cursor(int, int);

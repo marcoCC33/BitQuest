@@ -23,8 +23,8 @@ cantidad_caracter:
 .loop_col:
     cmp edx, r8d
     jge .fin_col
-    mov r5b, byte [r11 + rdx]
-    cmp r5b, r9b
+    mov r13b, byte [r11 + rdx]
+    cmp r13b, r9b
     jne .no_match
     inc eax                 ; Encontrado, incrementar contador
 .no_match:
@@ -46,7 +46,7 @@ calcular_puntuaje:
     imul edx, edx, 2        ; pasos * 2
 
     add ecx, r8d            ; (monedas*100) + (niveles*500)
-    sub ecx, edx            ; PuntuaciÃ³n final en ECX
+    sub ecx, edx            ; Puntuación final en ECX
 
     mov eax, ecx            ; Retornar en EAX
     cmp eax, 0              ; Evitar que el puntaje sea menor a 0
@@ -135,7 +135,7 @@ celdas_libres:
     cmp edx, r8d
     jge .l_col_fin
     mov r9b, [r11 + rdx]
-    cmp r9b, '.'            ; Â¿Es camino libre?
+    cmp r9b, '.'            ; ¿Es camino libre?
     jne .no_libre
     inc eax
 .no_libre:
