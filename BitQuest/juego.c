@@ -189,6 +189,62 @@ void dibujar_informacion(Jugador j, int max_coins) {
     printf(" \n" RESET);
 }
 
+void dibujar_resultados(Jugador j, int max_coins, int puntuacion, int espacios) {
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+
+    //Marcos tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 201);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 187);
+
+    for (int x = 0; x < MAX_VISIBLE_X; x++) {
+        //Marco izquierdo
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+
+        if (x == MAX_VISIBLE_X / 2 - 1) {
+            printf("        Cantidad de pasos: %d  ", j.cant_pasos);
+        }
+        else if (x == MAX_VISIBLE_X / 2) {
+            printf("      Relacion de monedas: %.2f  ", ((float)j.monedas) / max_coins);
+        }
+        else if (x == MAX_VISIBLE_X / 2) {
+            printf("  Celdas vacias del nivel: %d  ", espacios);
+        }
+        //Dibujado
+        else {
+            for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+                fondo_rgb(0, 0, 0);
+                color_rgb(0, 0, 0);
+                printf("  ");
+            }
+        }
+        //Marco derecho
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+        //Salto de línea sin dibujar de más
+        color_rgb(255, 255, 255);
+        fondo_rgb(0, 0, 0);
+        printf("\n");
+    }
+
+    //Marco inf tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 200);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 188);
+}
+
 Jugador encontrar_jugador(char** mapa, int ren, int col) {
     Jugador new_jugador;
 
@@ -206,4 +262,14 @@ Jugador encontrar_jugador(char** mapa, int ren, int col) {
     new_jugador.y = 0;
 
     return new_jugador;
+}
+
+void mover_jugador(char** mapa, int x1, int y1, int x2, int y2) {
+    char temp = mapa[x1][y1];
+    mapa[x1][y1] = mapa[x2][y2];
+    mapa[x2][y2] = temp;
+}
+
+int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y) {
+    return x == salida_x && y == salida_y;
 }

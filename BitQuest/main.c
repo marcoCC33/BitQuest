@@ -73,9 +73,12 @@ void imprimir_acercade_2();
 // void menu();
 
 int main() {
+    char nombre_nivel[20];
+    bool mapa = true;
     Jugador j;
-    int opcion;
-    int ren = 0, col = 0;
+    int opcion, nivel_act = 1;
+    int ren = 0, col = 0, tam_total = 0;
+    int total_monedas = 0; 
     char** mapa_cargado = NULL;
 
     j.x = j.y = j.monedas = j.cant_pasos = j.llaves = 0;
@@ -107,31 +110,86 @@ int main() {
         switch (opcion) {
         case 1:
             //Por qué cargaría un juego rancio de consola que pesa como 3 kilobytes???
-            mapa_cargado = cargar_mapa(&ren, &col, "mapas/Nivel1.txt");
-            printf(_LIMPIAR "\e[?25l");
-            if (mapa_cargado != NULL) {
-                bool completado = false;
+            mapa = true;
+            do {
+                sprintf(nombre_nivel, "mapas/Nivel%d.txt", nivel_act);
+                mapa_cargado = cargar_mapa(&ren, &col, nombre_nivel);
+                tam_total = ren * (col + 1) + 1;
+                total_monedas = cantidad_caracter(mapa_cargado, ren, col, 'M');
 
-                while (!completado) {
-                    //Detectar entrada del teclado
-                    if (_kbhit()) {
-                        char c = tolower(_getch());
-                        switch (c) {
-                        case 'p': printf(_LIMPIAR); break;
-                        default: printf("%c", c); break;
+                printf(_LIMPIAR "\e[?25l");
+                if (mapa_cargado != NULL) {
+                    bool completado = false;
+
+                    while (!completado) {
+                        //Detectar entrada del teclado
+                        if (_kbhit()) {
+                            char c = tolower(_getch());
+                            switch (c) {
+                            case 'p': printf(_LIMPIAR); break;
+
+                            case 'w':
+                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x, j.y - 1)) {
+                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x, j.y - 1, 'E');
+
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y - 1);
+                                    j.y -= 1;
+                                }
+                                break;
+
+                            case 'a':
+                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x - 1, j.y)) {
+                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x - 1, j.y, 'E');
+
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x - 1, j.y);
+                                    j.x -= 1;
+                                }
+                                break;
+
+                            case 's':
+                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x, j.y + 1)) {
+                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x, j.y + 1, 'E');
+
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y + 1);
+                                    j.y += 1;
+                                }
+                                break;
+
+                            case 'd':
+                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x + 1, j.y)) {
+                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x + 1, j.y, 'E');
+
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x + 1, j.y);
+                                    j.x += 1;
+                                }
+                                break;
+
+                            default: printf("%c", c); break;
+                            }
                         }
+
+                        //Dibujar
+                        ajustar_cursor(1, 1);
+                        dibujar_informacion(j, total_monedas);
+                        dibujar_resultados(j, total_monedas,
+                            calcular_puntuaje(j.monedas, j.cant_pasos, nivel_act),
+                            celdas_libres(&mapa_cargado[0][0], ren, col)
+                        );
+
+                        espera(500);
                     }
 
-                    //Dibujar
-                    ajustar_cursor(1, 1);
-                    dibujar_informacion(j, 10);
-                    dibujar_mapa(mapa_cargado, ren, col, j);
-                    espera(500);
+                    dibujar_informacion(j, total_monedas);
+                    printf("FIN");
+
+                    nivel_act++;
                 }
-            }
-            else {
-                printf("ERROR\n");
-            }
+                else {
+                    mapa = false;
+                }
+            } while (mapa);
+            printf("No hay mas mapas\n");
+
             espera(3000);
             break;
         case 2:

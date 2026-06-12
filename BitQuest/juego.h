@@ -41,14 +41,13 @@ void dibujar_mapa(char**, int, int, Jugador);
 
 Jugador encontrar_jugador(char**, int, int);
 // funciones para  rutinas.ASM
-int verificar_jugador(char*, int max_col, int x, int y);						// Verifica la posicion propuesta de movimiento y retorna un 1 si es valida o un 0 si no
 int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y);	//Podría ser en asm (verificaría si el jugador llegó a la salida)
-int cantidad_caracter(char*, int, int);											//ASM (devolvería la cantidad de 'caracter' en el mapa)
-int calcular_puntuaje(int, int, int);											//ASM
-int verificar_objeto(char*, int, int, int, int);								// Devuelve un 1 si está el objeto o un 0 si no está, verifica si existe un determinado objeto
-int celdas_libres(char*, int);													//ASM
-void encontrar_salida(char*, int*, int*, int, int);
-void mover_jugador(char* mapa, int x1, int y1, int x2, int y2);				//(movería al player)
+void mover_jugador(char** mapa, int x1, int y1, int x2, int y2);				//(movería al player)
+int verificar_jugador(char* mapa, int max_col, int sig_x, int sig_y);			// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
+int cantidad_caracter(char* mapa, int ren, int col, int caracter);				// ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
+int calcular_puntuaje(int monedas, int pasos, int nivel);						// ASM (monedas, pasos, niveles) - regresa puntuación final
+int verificar_objeto(char* mapa, int col, int x, int y, int caracter);			// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
+int celdas_libres(char* mapa, int ren, int col);								// ASM (mapa, ren, col) - regresa cuantos '.' hay
 
 //Dibujado etcétera
 void color_rgb(int, int, int);
