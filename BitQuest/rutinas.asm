@@ -9,33 +9,40 @@ section .text
 ;Funcion cantidad_caracter
 ;Contar monedas/caracteres
 cantidad_caracter:
-    xor eax, eax            ; Contador total = 0
-    xor r10d, r10d          ; i = 0 (filas)
+    xor eax, eax            ; total_coincidencias = 0
+    test rcx, rcx           ; Verificar si el puntero del mapa es NULL
+    jz .fin_cantidad
+    
+    xor r10d, r10d          ; r10d = i indice de filas
+
 .loop_ren:
     cmp r10d, edx
-    jge .fin_ren
-    mov r11, [rcx + r10 * 8] ; r11 = mapa[i]
-    test r11, r11
-    jz .skip_ren
+    jge .fin_cantidad
 
-    push rdx                ; Preservar filas totales
-    xor rdx, rdx            ; j = 0 (columnas)
+    xor r11d, r11d
 .loop_col:
-    cmp edx, r8d
-    jge .fin_col
-    mov r13b, byte [r11 + rdx]
+    cmp r11d, r8d
+    jge .sig_ren
+
+    mov r12d, r10d
+    imul r12d, r8d
+    add r12d, r11d
+
+    mov r13b, byte [rcx + r12]
+    
     cmp r13b, r9b
     jne .no_match
-    inc eax                 ; Encontrado, incrementar contador
+    inc eax                 ; total_coincidencias++
+
 .no_match:
-    inc edx                 ; j++
+    inc r11d                ; j++
     jmp .loop_col
-.fin_col:
-    pop rdx                 ; Restaurar filas totales
-.skip_ren:
+
+.sig_ren:
     inc r10d                ; i++
     jmp .loop_ren
-.fin_ren:
+
+.fin_cantidad:
     ret
 
 ; Funcion calcular_putaje
@@ -45,106 +52,116 @@ calcular_puntuaje:
     imul r8d, r8d, 500      ; niveles * 500
     imul edx, edx, 2        ; pasos * 2
 
-    add ecx, r8d            ; (monedas*100) + (niveles*500)
-    sub ecx, edx            ; Puntuaci�n final en ECX
+    add ecx, r8d            ; suma parcial
+    sub ecx, edx            ; menos penalización por pasos
 
-    mov eax, ecx            ; Retornar en EAX
-    cmp eax, 0              ; Evitar que el puntaje sea menor a 0
-    jge .fin_score
+    mov eax, ecx
+    cmp eax, 0              ; El puntaje nunca debe ser negativo
+    jge .fin_puntuaje
     xor eax, eax
-.fin_score:
+
+.fin_puntuaje:
     ret
 
 ; Funcion verificar_jugador
 ; recibe: char**, int, int, int
 ; devuelve 1 si es valido, 0 si no esta bloqueado
-; RCX = mapa ; RDX = col (# max de col del mapa); R8 = sig_x (fila propuesta) ; R9 = sig_y (columna propuesta) 
+; Parámetros:
+;   RCX = char* mapa
+;   RDX = int col         Columnas totales de la matriz
+;   R8  = int sig_x       Fila a la que se quiere mover
+;   R9  = int sig_y       Columna a la que se quiere mover
 verificar_jugador:
-	;validar que r8 no sea negativo
-	cmp r8d, 0
-	jl .bloqueado
-	;validar que r9 no sea negativo
-	cmp r9d, 0
-	jl .bloqueado
+    ; Validar límites inferiores
+    cmp r8d, 0
+    jl .bloqueado
+    cmp r9d, 0
+    jl .bloqueado
+    
+    ; EDX para checar los limites
+    cmp r9d, edx
+    jge .bloqueado
 
-	;validar limite maximo de columnas
-	cmp r9d, edx
-	jge .bloqueado
+    mov r10d, r8d
+    imul r10d, edx
+    add r10d, r9d
 
-	;obtener la fila propuesta mapa[sig_x]
-	mov r11, [rcx + r8 * 8]
-	test r11, r11
-	jz .bloqueado
+    ; Obtener el carácter
+    mov al, byte [rcx + r10]
 
-	;obtener el caracter en la posicion mapa[sig_x][sig_y]
-	mov al, [r11 + r9]
+    cmp al, '#'             ; Pared
+    je .bloqueado
 
-	;si es una pared #, el movimiento no es valido
-	cmp al, '#'
-	je .bloqueado
+    mov eax, 1              ; Movimiento aprobado
+    ret
 
-	;si todo ok retornar 1
-	mov eax, 1
-	ret
-
-	.bloqueado:
-		mov eax, 0
-ret
+.bloqueado:
+    mov eax, 0              ; Movimiento denegado
+    ret
 
 ; Funcion verificar_objeto
 ; Que hace? Verifica en el mapa que exista un determinado objeto
 ; recibe: char**, int, int, int, int
 ; devuelve 1 si lo encontro, 0 si no lo encontro
-; RCX = mapa ; RDX = col ; R8 = x ; R9 = y ; [RSP+40] = obj
+; Parámetros:
+;   RCX = char* mapa
+;   RDX = int col         Ancho total de columnas
+;   R8  = int x           fila
+;   R9  = int y           columna
+;   [RSP+40] = int obj    El carácter buscado viene en el espacio de la pila
 verificar_objeto:
-	mov r11, [rcx + r8 * 8]
-	test r11, r11
-	jz .falso
+    mov r10d, r8d
+    imul r10d, edx
+    add r10d, r9d
 
-	;caracter actual en la celda
-	mov al, [r11 + r9]
+    mov al, byte [rcx + r10]
+    mov r11d, [rsp + 40]
 
-	; (5to parametro) 32 bytes + (Dir retorno) 8 bytes = 40 bytes
-	mov r10d, [rsp + 40]
+    cmp al, r11b            ; comparar para ver si es el objeto
+    jne .no_es
 
-	cmp al, r10b	;es el objeto buscado?
-	jne .falso
+    mov eax, 1              ; Verdadero
+    ret
 
-	mov eax, 1	;si es
-	ret
-
-	.falso:
-		mov eax,0	;no es
-ret
+.no_es:
+    mov eax, 0              ; Falso
+    ret
 
 ; Funcion celdas_libres
 ; Cuenta cuantos caminos '.' quedan limpios
+; Parámetros:
+;   RCX = char* mapa
+;   RDX = int ren
+;   R8  = int col
 celdas_libres:
-    xor eax, eax            ; total_libres = 0
-    xor r10d, r10d          ; i = 0 (filas)
+    xor eax, eax
+    xor r10d, r10d
+
 .l_ren:
     cmp r10d, edx
     jge .l_fin
-    mov r11, [rcx + r10 * 8]
-    test r11, r11
-    jz .l_skip
 
-    push rdx
-    xor rdx, rdx            ; j = 0 (columnas)
+    xor r11d, r11d          ; j = 0 (columnas)
 .l_col:
-    cmp edx, r8d
-    jge .l_col_fin
-    mov r9b, [r11 + rdx]
-    cmp r9b, '.'            ; �Es camino libre?
+    cmp r11d, r8d
+    jge .l_sig_ren
+
+    mov r12d, r10d
+    imul r12d, r8d
+    add r12d, r11d
+
+    mov r13b, byte [rcx + r12]
+    cmp r13b, '.'            ; camino
     jne .no_libre
-    inc eax
+    inc eax                 ; total_libres++
+
 .no_libre:
-    inc edx
+    inc r11d                ; j++
     jmp .l_col
-.l_col_fin:
-    pop rdx
-.l_skip:
-    inc r10d
+
+.l_sig_ren:
+    inc r10d                ; i++
     jmp .l_ren
+
 .l_fin:
     ret
