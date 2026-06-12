@@ -6,6 +6,55 @@ global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto
 
 section .text
 
+;Funcion cantidad_caracter
+;Contar monedas/caracteres
+cantidad_caracter:
+    xor eax, eax            ; Contador total = 0
+    xor r10d, r10d          ; i = 0 (filas)
+.loop_ren:
+    cmp r10d, edx
+    jge .fin_ren
+    mov r11, [rcx + r10 * 8] ; r11 = mapa[i]
+    test r11, r11
+    jz .skip_ren
+
+    push rdx                ; Preservar filas totales
+    xor rdx, rdx            ; j = 0 (columnas)
+.loop_col:
+    cmp edx, r8d
+    jge .fin_col
+    mov r5b, byte [r11 + rdx]
+    cmp r5b, r9b
+    jne .no_match
+    inc eax                 ; Encontrado, incrementar contador
+.no_match:
+    inc edx                 ; j++
+    jmp .loop_col
+.fin_col:
+    pop rdx                 ; Restaurar filas totales
+.skip_ren:
+    inc r10d                ; i++
+    jmp .loop_ren
+.fin_ren:
+    ret
+
+; Funcion calcular_putaje
+; calcula el score: (moendas * 100) + (niveles * 500) - (pasos * 2)
+calcular_puntuaje:
+    imul ecx, ecx, 100      ; monedas * 100
+    imul r8d, r8d, 500      ; niveles * 500
+    imul edx, edx, 2        ; pasos * 2
+
+    add ecx, r8d            ; (monedas*100) + (niveles*500)
+    sub ecx, edx            ; Puntuación final en ECX
+
+    mov eax, ecx            ; Retornar en EAX
+    cmp eax, 0              ; Evitar que el puntaje sea menor a 0
+    jge .fin_score
+    xor eax, eax
+.fin_score:
+    ret
+
 ; Funcion verificar_jugador
 ; recibe: char**, int, int, int
 ; devuelve 1 si es valido, 0 si no esta bloqueado
@@ -67,3 +116,35 @@ verificar_objeto:
 	.falso:
 		mov eax,0	;no es
 ret
+
+; Funcion celdas_libres
+; Cuenta cuantos caminos '.' quedan limpios
+celdas_libres:
+    xor eax, eax            ; total_libres = 0
+    xor r10d, r10d          ; i = 0 (filas)
+.l_ren:
+    cmp r10d, edx
+    jge .l_fin
+    mov r11, [rcx + r10 * 8]
+    test r11, r11
+    jz .l_skip
+
+    push rdx
+    xor rdx, rdx            ; j = 0 (columnas)
+.l_col:
+    cmp edx, r8d
+    jge .l_col_fin
+    mov r9b, [r11 + rdx]
+    cmp r9b, '.'            ; ¿Es camino libre?
+    jne .no_libre
+    inc eax
+.no_libre:
+    inc edx
+    jmp .l_col
+.l_col_fin:
+    pop rdx
+.l_skip:
+    inc r10d
+    jmp .l_ren
+.l_fin:
+    ret
