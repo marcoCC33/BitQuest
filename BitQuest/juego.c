@@ -1,7 +1,5 @@
-#pragma once
-#include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 #include "juego.h"
 
 //Funciones para jugar con el color del texto en consola
@@ -29,8 +27,8 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
         min_x = 0; max_x = MAX_VISIBLE_X;
     }
     //Más a la derecha
-    else if (j.x > col - MAX_VISIBLE_X / 2) {
-        min_x = col - MAX_VISIBLE_X; max_x = col;
+    else if (j.x > ren - MAX_VISIBLE_X / 2) {
+        min_x = ren - MAX_VISIBLE_X; max_x = ren;
     }
     //Enmedio
     else {
@@ -44,8 +42,8 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
         min_y = 0; max_y = MAX_VISIBLE_Y;
     }
     //Más a abajo
-    else if (j.y > ren - MAX_VISIBLE_Y / 2) {
-        min_y = ren - MAX_VISIBLE_Y; max_y = ren;
+    else if (j.y > col - MAX_VISIBLE_Y / 2 - 1) {
+        min_y = col - MAX_VISIBLE_Y - 1; max_y = col;
     }
     //Enmedio
     else {
@@ -209,12 +207,17 @@ void dibujar_resultados(Jugador j, int max_coins, int puntuacion, int espacios) 
         printf("%c", 186);
 
         if (x == MAX_VISIBLE_X / 2 - 1) {
-            printf("        Cantidad de pasos: %d  ", j.cant_pasos);
+            printf("        Cantidad de pasos: %d", j.cant_pasos);
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 12; i > 0 && pow(10, i) > j.cant_pasos; i--) {
+                printf(" ");
+            }
         }
         else if (x == MAX_VISIBLE_X / 2) {
-            printf("      Relacion de monedas: %.2f  ", ((float)j.monedas) / max_coins);
+            printf("      Relacion de monedas: %.2f  ", ((float)j.monedas) / max_coins * 100);
         }
-        else if (x == MAX_VISIBLE_X / 2) {
+        else if (x == MAX_VISIBLE_X / 2 + 1) {
             printf("  Celdas vacias del nivel: %d  ", espacios);
         }
         //Dibujado
@@ -248,6 +251,10 @@ void dibujar_resultados(Jugador j, int max_coins, int puntuacion, int espacios) 
 Jugador encontrar_jugador(char** mapa, int ren, int col) {
     Jugador new_jugador;
 
+    new_jugador.cant_pasos = 0;
+    new_jugador.llaves = 0;
+    new_jugador.monedas = 0;
+
     for (int x = 0; x < ren; x++) {
         for (int y = 0; y < col; y++) {
             if (mapa[x][y] == 'P') {
@@ -265,9 +272,8 @@ Jugador encontrar_jugador(char** mapa, int ren, int col) {
 }
 
 void mover_jugador(char** mapa, int x1, int y1, int x2, int y2) {
-    char temp = mapa[x1][y1];
-    mapa[x1][y1] = mapa[x2][y2];
-    mapa[x2][y2] = temp;
+    mapa[x2][y2] = mapa[x1][y1];
+    mapa[x1][y1] = '.';
 }
 
 int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y) {

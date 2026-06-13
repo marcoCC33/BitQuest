@@ -8,8 +8,8 @@
 #define _CRT_SECURE_NO_WARNINGS // Para omitir las advertencias de scanf inseguro o unsafe
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "juego.h"
-#include "juego.c"
 #include "mapas.h"
 
 //---------- Definición de Input para evitar usar ENTER - para Windows, Linux y con suerte Mac ---------//
@@ -79,11 +79,13 @@ int main() {
     int opcion, nivel_act = 1;
     int ren = 0, col = 0, tam_total = 0;
     int total_monedas = 0; 
+    long puntaje = 0;
     char** mapa_cargado = NULL;
 
     j.x = j.y = j.monedas = j.cant_pasos = j.llaves = 0;
 
     do {
+        nivel_act = 1;
         // Limpieza de consola
         printf(_LIMPIAR);
         // Título y Subtítulo con colores
@@ -114,12 +116,18 @@ int main() {
             do {
                 sprintf(nombre_nivel, "mapas/Nivel%d.txt", nivel_act);
                 mapa_cargado = cargar_mapa(&ren, &col, nombre_nivel);
+
+                printf("MAPA CARGADO\n");
                 tam_total = ren * (col + 1) + 1;
-                total_monedas = cantidad_caracter(mapa_cargado, ren, col, 'M');
 
                 printf(_LIMPIAR "\e[?25l");
                 if (mapa_cargado != NULL) {
                     bool completado = false;
+                    bool llave = false;
+                    bool moneda = false;
+
+                    total_monedas = cantidad_caracter(mapa_cargado, ren, col, 'M');
+                    j = encontrar_jugador(mapa_cargado, ren, col);
 
                     while (!completado) {
                         //Detectar entrada del teclado
@@ -129,58 +137,86 @@ int main() {
                             case 'p': printf(_LIMPIAR); break;
 
                             case 'w':
-                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x, j.y - 1)) {
-                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x, j.y - 1, 'E');
+                                if (verificar_jugador(mapa_cargado, col, j.x - 1, j.y, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'E');
+                                    llave = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'M');
 
-                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y - 1);
-                                    j.y -= 1;
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x - 1, j.y);
+                                    j.x -= 1;
+                                    j.cant_pasos++;
                                 }
                                 break;
 
                             case 'a':
-                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x - 1, j.y)) {
-                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x - 1, j.y, 'E');
+                                if (verificar_jugador(mapa_cargado, col, j.x, j.y - 1, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'E');
+                                    llave = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'M');
 
-                                    mover_jugador(mapa_cargado, j.x, j.y, j.x - 1, j.y);
-                                    j.x -= 1;
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y - 1);
+                                    j.y -= 1;
+                                    j.cant_pasos++;
                                 }
                                 break;
 
                             case 's':
-                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x, j.y + 1)) {
-                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x, j.y + 1, 'E');
+                                if (verificar_jugador(mapa_cargado, col, j.x + 1, j.y, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'E');
+                                    llave = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'M');
 
-                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y + 1);
-                                    j.y += 1;
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x + 1, j.y);
+                                    j.x += 1;
+                                    j.cant_pasos++;
                                 }
                                 break;
 
                             case 'd':
-                                if (verificar_jugador(&mapa_cargado[0][0], tam_total, j.x + 1, j.y)) {
-                                    completado = verificar_objeto(&mapa_cargado[0][0], tam_total, j.x + 1, j.y, 'E');
+                                if (verificar_jugador(mapa_cargado, col, j.x, j.y + 1, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'E');
+                                    llave = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'M');
 
-                                    mover_jugador(mapa_cargado, j.x, j.y, j.x + 1, j.y);
-                                    j.x += 1;
+                                    mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y + 1);
+                                    j.y += 1;
+                                    j.cant_pasos++;
                                 }
                                 break;
 
                             default: printf("%c", c); break;
                             }
                         }
+                        //Verifica si el jugador obtuvo una llave
+                        if (llave) {
+                            llave = false;
+                            j.llaves++;
+                        }
+                        //Verifica si el jugador obtuvo una coinnn
+                        if (moneda) {
+                            moneda = false;
+                            j.monedas++;
+                        }
 
                         //Dibujar
                         ajustar_cursor(1, 1);
                         dibujar_informacion(j, total_monedas);
-                        dibujar_resultados(j, total_monedas,
-                            calcular_puntuaje(j.monedas, j.cant_pasos, nivel_act),
-                            celdas_libres(&mapa_cargado[0][0], ren, col)
-                        );
+                        dibujar_mapa(mapa_cargado, ren, col, j);
 
-                        espera(500);
+                        espera(100);
                     }
+                    long new_puntaje = calcular_puntuaje(j.monedas, j.cant_pasos, nivel_act);
 
+                    ajustar_cursor(1, 1);
                     dibujar_informacion(j, total_monedas);
+                    dibujar_resultados(j, total_monedas,
+                        new_puntaje,
+                        celdas_libres(mapa_cargado, ren, col)
+                    );
                     printf("FIN");
+                    pausa();
+
+                    puntaje += new_puntaje;
 
                     nivel_act++;
                 }

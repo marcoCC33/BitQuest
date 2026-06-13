@@ -65,6 +65,7 @@ cantidad_caracter:
 ;   RDX = int col         (Columnas totales de la matriz, para validación)
 ;   R8  = int sig_x       (Fila propuesta)
 ;   R9  = int sig_y       (Columna propuesta)
+;   [RSP+40] = int* llave (5to parámetro guardado en la pila)
 ; ==============================================================================
 verificar_jugador:
     ; Validar límites inferiores
@@ -87,8 +88,20 @@ verificar_jugador:
 
     cmp al, '#'             ; Pared
     je .bloqueado
+    
+    cmp al, 'D'             ; Puerta
+    je .puerta
 
     mov eax, 1              ; Movimiento permitido
+    ret
+
+    ;Se encuentra con un puerta, si hay llaves se deja pasar, si no, nel
+.puerta:
+    mov r10, [rsp + 40]     ; Recupera la cantidad de llaves
+    cmp [r10], 0
+    jle .bloqueado
+    mov eax, 1              ; Se mueve
+    dec [r10]               ; Reduce la cantidad de llaves
     ret
 
 .bloqueado:

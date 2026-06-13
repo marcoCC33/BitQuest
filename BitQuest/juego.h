@@ -36,18 +36,20 @@ typedef struct {
 	int cant_pasos;
 } Jugador;
 
-void dibujar_informacion(Jugador, int);
-void dibujar_mapa(char**, int, int, Jugador);
+void dibujar_informacion(Jugador j, int max_coins);
+void dibujar_mapa(char** mapa, int ren, int col, Jugador j);
 
 Jugador encontrar_jugador(char**, int, int);
-// funciones para  rutinas.ASM
 int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y);	//Podría ser en asm (verificaría si el jugador llegó a la salida)
 void mover_jugador(char** mapa, int x1, int y1, int x2, int y2);				//(movería al player)
-int verificar_jugador(char* mapa, int max_col, int sig_x, int sig_y);			// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
-int cantidad_caracter(char* mapa, int ren, int col, int caracter);				// ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
-int calcular_puntuaje(int monedas, int pasos, int nivel);						// ASM (monedas, pasos, niveles) - regresa puntuación final
-int verificar_objeto(char* mapa, int col, int x, int y, int caracter);			// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
-int celdas_libres(char* mapa, int ren, int col);								// ASM (mapa, ren, col) - regresa cuantos '.' hay
+void dibujar_resultados(Jugador j, int max_coins, int puntuacion, int espacios);
+
+// funciones para  rutinas.ASM
+int verificar_jugador(char** mapa, int max_col, int sig_x, int sig_y, int* llave);		// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
+int cantidad_caracter(char** mapa, int ren, int col, int caracter);						// ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
+int calcular_puntuaje(int monedas, int pasos, int nivel);								// ASM (monedas, pasos, niveles) - regresa puntuación final
+int verificar_objeto(char** mapa, int col, int x, int y, int caracter);					// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
+int celdas_libres(char** mapa, int ren, int col);										// ASM (mapa, ren, col) - regresa cuantos '.' hay
 
 //Dibujado etcétera
 void color_rgb(int, int, int);
