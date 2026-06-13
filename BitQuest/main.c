@@ -82,7 +82,7 @@ int main() {
     long puntaje = 0;
     char** mapa_cargado = NULL;
 
-    j.x = j.y = j.monedas = j.cant_pasos = j.llaves = 0;
+    j.x = j.y = j.puntaje = j.monedas = j.cant_pasos = j.llaves = 0;
 
     do {
         nivel_act = 1;
@@ -122,12 +122,13 @@ int main() {
 
                 printf(_LIMPIAR "\e[?25l");
                 if (mapa_cargado != NULL) {
+                    int pasos = 0;
                     bool completado = false;
                     bool llave = false;
                     bool moneda = false;
 
                     total_monedas = cantidad_caracter(mapa_cargado, ren, col, 'M');
-                    j = encontrar_jugador(mapa_cargado, ren, col);
+                    j = encontrar_jugador(mapa_cargado, ren, col, j);
 
                     while (!completado) {
                         //Detectar entrada del teclado
@@ -144,7 +145,7 @@ int main() {
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x - 1, j.y);
                                     j.x -= 1;
-                                    j.cant_pasos++;
+                                    pasos++;
                                 }
                                 break;
 
@@ -156,7 +157,7 @@ int main() {
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y - 1);
                                     j.y -= 1;
-                                    j.cant_pasos++;
+                                    pasos++;
                                 }
                                 break;
 
@@ -168,7 +169,7 @@ int main() {
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x + 1, j.y);
                                     j.x += 1;
-                                    j.cant_pasos++;
+                                    pasos++;
                                 }
                                 break;
 
@@ -180,7 +181,7 @@ int main() {
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y + 1);
                                     j.y += 1;
-                                    j.cant_pasos++;
+                                    pasos++;
                                 }
                                 break;
 
@@ -207,16 +208,19 @@ int main() {
                     }
                     long new_puntaje = calcular_puntuaje(j.monedas, j.cant_pasos, nivel_act);
 
+                    j.total_monedas += j.monedas;
+                    j.puntaje += new_puntaje;
+                    j.cant_pasos += pasos;
+
                     ajustar_cursor(1, 1);
                     dibujar_informacion(j, total_monedas);
-                    dibujar_resultados(j, total_monedas,
+                    dibujar_resultados(mapa_cargado,
+j, total_monedas,
                         new_puntaje,
-                        celdas_libres(mapa_cargado, ren, col)
+                        celdas_libres(mapa_cargado, ren, col),
+                        pasos
                     );
-                    printf("FIN");
-                    pausa();
-
-                    puntaje += new_puntaje;
+                    _getch();
 
                     nivel_act++;
                 }

@@ -2,7 +2,7 @@ bits 64
 
 default rel
 
-global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto, celdas_libres
+global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto, celdas_libres, mover_jugador
 
 section .text
 
@@ -210,4 +210,31 @@ celdas_libres:
     jmp .l_ren
 
 .l_fin:
+    ret
+
+; ==============================================================================
+; Funcion: mover_jugador
+; Que hace? mueve al jugador
+; C prototipo: int cantidad_caracter(char** mapa, int x1, int y1, int x2, int y2);
+; Parámetros:
+;          RCX = char** mapa
+;          RDX = int renglón original
+;          R8  = int columna original
+;          R9  = int nuevo renglón
+;   [RSP + 40] = int nueva columna
+; ==============================================================================
+mover_jugador:
+    xor     r10, r10
+    mov     r10d, [RSP + 40]         ;Carga la nueva columna en r10
+
+    ;Obtiene el jugador
+    mov     r11, [rcx + rdx * 8]    ;fila 
+    mov     r12, [r11 + r8]
+    mov     r13b, '.'
+    mov     [r11 + r8], r13b
+
+    ;Mueve el jugador
+    mov     r11, [rcx + r9 * 8]     ;new fila
+    mov     [r11 + r10], r12b
+
     ret
