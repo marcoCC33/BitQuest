@@ -6,36 +6,46 @@ global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto
 
 section .text
 
-;Funcion cantidad_caracter
-;Contar monedas/caracteres
+; ==============================================================================
+; Funcion: cantidad_caracter
+; Que hace? Contar monedas u otros elementos
+; C prototipo: int cantidad_caracter(char** mapa, int ren, int col, int caracter);
+; Parámetros:
+;   RCX = char** mapa
+;   RDX = int ren         Limitador de filas
+;   R8  = int col         Límitador de columnas
+;   R9  = int caracter    Carácter buscado promovido a entero
+; ==============================================================================
 cantidad_caracter:
     xor eax, eax            ; total_coincidencias = 0
-    test rcx, rcx           ; Verificar si el puntero del mapa es NULL
+    test rcx, rcx           ; Validar que la dirección base no sea NULL
     jz .fin_cantidad
     
-    xor r10d, r10d          ; r10d = i indice de filas
+    xor r10d, r10d          ; r10d = i (índice de filas) = 0
 
 .loop_ren:
     cmp r10d, edx
     jge .fin_cantidad
 
-    xor r11d, r11d
+    ; Cargar la dirección de la fila actual: mapa[i]
+    mov r11, [rcx + r10 * 8]
+    test r11, r11           ; Si la fila es NULL, saltar
+    jz .sig_ren
+
+    xor r12d, r12d          ; r12d = j (índice de columnas) = 0
 .loop_col:
-    cmp r11d, r8d
+    cmp r12d, r8d
     jge .sig_ren
 
-    mov r12d, r10d
-    imul r12d, r8d
-    add r12d, r11d
-
-    mov r13b, byte [rcx + r12]
+    ; Leer el byte exacto desde la fila cargada: mapa[i][j]
+    mov r13b, byte [r11 + r12]
     
-    cmp r13b, r9b
+    cmp r13b, r9b           ; Caracter buscado
     jne .no_match
     inc eax                 ; total_coincidencias++
 
 .no_match:
-    inc r11d                ; j++
+    inc r12d                ; j++
     jmp .loop_col
 
 .sig_ren:
@@ -45,118 +55,141 @@ cantidad_caracter:
 .fin_cantidad:
     ret
 
-; Funcion calcular_putaje
-; calcula el score: (moendas * 100) + (niveles * 500) - (pasos * 2)
-calcular_puntuaje:
-    imul ecx, ecx, 100      ; monedas * 100
-    imul r8d, r8d, 500      ; niveles * 500
-    imul edx, edx, 2        ; pasos * 2
 
-    add ecx, r8d            ; suma parcial
-    sub ecx, edx            ; menos penalizaciÃ³n por pasos
-
-    mov eax, ecx
-    cmp eax, 0              ; El puntaje nunca debe ser negativo
-    jge .fin_puntuaje
-    xor eax, eax
-
-.fin_puntuaje:
-    ret
-
+; ==============================================================================
 ; Funcion verificar_jugador
-; recibe: char**, int, int, int
-; devuelve 1 si es valido, 0 si no esta bloqueado
-; ParÃ¡metros:
-;   RCX = char* mapa
-;   RDX = int col         Columnas totales de la matriz
-;   R8  = int sig_x       Fila a la que se quiere mover
-;   R9  = int sig_y       Columna a la que se quiere mover
+; Que hace? Validar si el movimiento choca con pared
+; C prototipo: int verificar_jugador(char** mapa, int col, int sig_x, int sig_y);
+; Parámetros:
+;   RCX = char** mapa
+;   RDX = int col         (Columnas totales de la matriz, para validación)
+;   R8  = int sig_x       (Fila propuesta)
+;   R9  = int sig_y       (Columna propuesta)
+; ==============================================================================
 verificar_jugador:
-    ; Validar lÃ­mites inferiores
+    ; Validar límites inferiores
     cmp r8d, 0
     jl .bloqueado
     cmp r9d, 0
     jl .bloqueado
     
-    ; EDX para checar los limites
+    ; Validar límites superiores de la columna usando RDX
     cmp r9d, edx
     jge .bloqueado
 
-    mov r10d, r8d
-    imul r10d, edx
-    add r10d, r9d
+    ; Obtener la dirección base de la fila propuesta: mapa[sig_x]
+    mov r11, [rcx + r8 * 8]
+    test r11, r11           ; Verificar que la fila exista en memoria
+    jz .bloqueado
 
-    ; Obtener el carÃ¡cter
-    mov al, byte [rcx + r10]
+    ; Obtener el carácter de la celda destino: mapa[sig_x][sig_y]
+    mov al, byte [r11 + r9]
 
     cmp al, '#'             ; Pared
     je .bloqueado
 
-    mov eax, 1              ; Movimiento aprobado
+    mov eax, 1              ; Movimiento permitido
     ret
 
 .bloqueado:
     mov eax, 0              ; Movimiento denegado
     ret
 
-; Funcion verificar_objeto
-; Que hace? Verifica en el mapa que exista un determinado objeto
-; recibe: char**, int, int, int, int
-; devuelve 1 si lo encontro, 0 si no lo encontro
-; ParÃ¡metros:
-;   RCX = char* mapa
-;   RDX = int col         Ancho total de columnas
-;   R8  = int x           fila
-;   R9  = int y           columna
-;   [RSP+40] = int obj    El carÃ¡cter buscado viene en el espacio de la pila
+
+; ==============================================================================
+; Funcion: calcular_puntuaje (Obligatoria: Multiplicaciones y score final)
+; C prototipo: int calcular_puntuaje(int monedas, int pasos, int niveles);
+; Formula: (monedas * 100) + (niveles * 500) - (pasos * 2)
+; ==============================================================================
+calcular_puntuaje:
+    imul ecx, ecx, 100      ; monedas * 100
+    imul r8d, r8d, 500      ; niveles * 500
+    imul edx, edx, 2        ; pasos * 2
+
+    add ecx, r8d            ; suma parcial de bonos
+    sub ecx, edx            ; restar penalización por pasos
+
+    mov eax, ecx
+    cmp eax, 0              ; Proteger para que el score nunca baje de 0
+    jge .fin_puntuaje
+    xor eax, eax
+
+.fin_puntuaje:
+    ret
+
+
+; ==============================================================================
+; Funcion: verificar_objeto
+; Que hace? Detectar qué objeto hay en una celda
+; C prototipo: int verificar_objeto(char** mapa, int col, int x, int y, int obj);
+; Parámetros:
+;   RCX = char** mapa
+;   RDX = int col
+;   R8  = int x           (Coordenada Fila)
+;   R9  = int y           (Coordenada Columna)
+;   [RSP+40] = int obj    (5to parámetro guardado en la pila)
+; ==============================================================================
 verificar_objeto:
-    mov r10d, r8d
-    imul r10d, edx
-    add r10d, r9d
+    ; Obtener la dirección de la fila mapa[x]
+    mov r11, [rcx + r8 * 8]
+    test r11, r11
+    jz .no_es
 
-    mov al, byte [rcx + r10]
-    mov r11d, [rsp + 40]
+    ; Cargar el carácter real de la celda mapa[x][y]
+    mov al, byte [r11 + r9]
 
-    cmp al, r11b            ; comparar para ver si es el objeto
+    mov r10d, [rsp + 40]
+
+    cmp al, r10b            ; Caracter de la celda y el objetivo
     jne .no_es
 
-    mov eax, 1              ; Verdadero
+    mov eax, 1              ; Sí es el objeto
     ret
 
 .no_es:
-    mov eax, 0              ; Falso
+    mov eax, 0              ; No es el objeto
     ret
 
+
+; ==============================================================================
 ; Funcion celdas_libres
-; Cuenta cuantos caminos '.' quedan limpios
-; ParÃ¡metros:
-;   RCX = char* mapa
+; Que hace? Contar caminos libres '.'
+; C prototipo: int celdas_libres(char** mapa, int ren, int col); [cite: 233]
+; Parámetros:
+;   RCX = char** mapa
 ;   RDX = int ren
 ;   R8  = int col
+; ==============================================================================
 celdas_libres:
-    xor eax, eax
-    xor r10d, r10d
+    xor eax, eax            ; total_libres = 0
+    test rcx, rcx
+    jz .l_fin
+
+    xor r10d, r10d          ; r10d = i (índice de filas) = 0
 
 .l_ren:
     cmp r10d, edx
     jge .l_fin
 
-    xor r11d, r11d          ; j = 0 (columnas)
+    ; Extraer la dirección de la fila actual: r11 = mapa[i]
+    mov r11, [rcx + r10 * 8]
+    test r11, r11           ; Si la fila es inválida o NULL, saltar
+    jz .l_sig_ren
+
+    xor r12d, r12d          ; r12d = j (índice de columnas) = 0
 .l_col:
-    cmp r11d, r8d
+    cmp r12d, r8d
     jge .l_sig_ren
 
-    mov r12d, r10d
-    imul r12d, r8d
-    add r12d, r11d
-
-    mov r13b, byte [rcx + r12]
-    cmp r13b, '.'            ; camino
+    ; Leer el caracter
+    mov r13b, byte [r11 + r12]
+    
+    cmp r13b, '.'           ; Camino libre
     jne .no_libre
     inc eax                 ; total_libres++
 
 .no_libre:
-    inc r11d                ; j++
+    inc r12d                ; j++
     jmp .l_col
 
 .l_sig_ren:
