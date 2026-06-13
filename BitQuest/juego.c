@@ -303,32 +303,3 @@ void dibujar_resultados(char** mapa, Jugador j, int max_coins, int puntuacion, i
     }
     printf("%c\n", 188);
 }
-
-Jugador encontrar_jugador(char** mapa, int ren, int col, Jugador old) {
-    Jugador new_jugador;
-
-    new_jugador.cant_pasos = old.cant_pasos;
-    new_jugador.llaves = 0;
-    new_jugador.monedas = 0;
-    new_jugador.puntaje = old.puntaje;
-    new_jugador.total_monedas = old.total_monedas;
-
-    for (int x = 0; x < ren; x++) {
-        for (int y = 0; y < col; y++) {
-            if (mapa[x][y] == 'P') {
-                new_jugador.x = x;
-                new_jugador.y = y;
-                return new_jugador;
-            }
-        }
-    }
-
-    new_jugador.x = 0;
-    new_jugador.y = 0;
-
-    return new_jugador;
-}
-
-int nivel_completado(char** mapa, int x, int y, int salida_x, int salida_y) {
-    return x == salida_x && y == salida_y;
-}

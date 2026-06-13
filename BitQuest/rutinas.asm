@@ -2,7 +2,7 @@ bits 64
 
 default rel
 
-global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto, celdas_libres, mover_jugador
+global verificar_jugador, cantidad_caracter, calcular_puntuaje, verificar_objeto, celdas_libres, mover_jugador, encontrar_jugador
 
 section .text
 
@@ -236,5 +236,55 @@ mover_jugador:
     ;Mueve el jugador
     mov     r11, [rcx + r9 * 8]     ;new fila
     mov     [r11 + r10], r12b
+
+    ret
+
+; ==============================================================================
+; Funcion: encontrar_jugador
+; Que hace? encuentra el jugador en el mapa y lo inicializa para el nuevo nivel
+; C prototipo: void encontrar_jugador(char** mapa, int ren, int col, Jugador* j);
+; Parámetros:
+;          RCX = char** mapa
+;          RDX = int renglones máximos
+;          R8  = int columnas máximas
+;          R9  = Jugador* puntero a jugador
+; ==============================================================================
+; Registros:
+;       r10: puntero actual a la fila
+;       r11: contador en X/ filas
+;       r12: contador en Y/ columnas
+; ==============================================================================
+encontrar_jugador:
+    xor     r11, r11        ; r11 es X
+    xor     r12, r12        ; r12 es Y
+
+    .loop_renglones:
+        cmp     r11d, edx        ;Que no se salga de los renglones
+        jge     .fin_busqueda
+        mov     r10, [rcx + r11 * 8]    ;new renglón
+        xor     r12, r12     ;Iniciar Y
+
+        .loop_columnas:
+            cmp     r12d, r8d            ;que no se salga de las columnas
+            jge     .fin_columnas
+            cmp     byte [r10 + r12], 'P'
+            je      .fin_busqueda
+
+            inc     r12
+            jmp     .loop_columnas
+
+        .fin_columnas:
+        inc     r11
+        jmp     .loop_renglones
+
+    .fin_busqueda:
+    ;Guarda la nueva posición del jugador
+    ;[r9] = x   [r9 + 4] = y
+    mov     [r9],     r11
+    mov     [r9 + 4], r12
+
+    ;limpia el resto de variables
+    mov     [r9 + 8], 0     ;monedas
+    mov     [r9 + 16], 0    ;llaves
 
     ret

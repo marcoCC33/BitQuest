@@ -128,7 +128,7 @@ int main() {
                     bool moneda = false;
 
                     total_monedas = cantidad_caracter(mapa_cargado, ren, col, 'M');
-                    j = encontrar_jugador(mapa_cargado, ren, col, j);
+                    encontrar_jugador(mapa_cargado, ren, col, &j);
 
                     while (!completado) {
                         //Detectar entrada del teclado
