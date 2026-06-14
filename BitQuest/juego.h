@@ -39,10 +39,10 @@ typedef struct {
 } Jugador;
 
 void imprimir_objeto(char, float);
-void dibujar_informacion(Jugador j, int max_coins);
+void dibujar_informacion(Jugador j, int max_coins, int nivel);
 void dibujar_mapa(char** mapa, int ren, int col, Jugador j);
 void dibujar_resultados(char** mapa, Jugador j, int max_coins, int puntuacion, int espacios, int pasos);
-
+void dibujar_final(Jugador j, int max_coins, int nivel);
 
 // funciones para  rutinas.ASM
 void encontrar_jugador(char** mapa, int ren, int col, Jugador* j);						// ASM Recibe una estructura Jugador y le guarda la posición de la primera 'P' que encuentra

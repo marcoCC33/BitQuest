@@ -78,11 +78,11 @@ int main() {
     Jugador j;
     int opcion, nivel_act = 1;
     int ren = 0, col = 0, tam_total = 0;
-    int total_monedas = 0; 
+    int total_monedas = 0, total_final_monedas = 0; 
     long puntaje = 0;
     char** mapa_cargado = NULL;
 
-    j.x = j.y = j.puntaje = j.monedas = j.cant_pasos = j.llaves = 0;
+    j.x = j.y = j.puntaje = j.total_monedas = j.monedas = j.cant_pasos = j.llaves = 0;
 
     do {
         nivel_act = 1;
@@ -117,7 +117,6 @@ int main() {
                 sprintf(nombre_nivel, "mapas/Nivel%d.txt", nivel_act);
                 mapa_cargado = cargar_mapa(&ren, &col, nombre_nivel);
 
-                printf("MAPA CARGADO\n");
                 tam_total = ren * (col + 1) + 1;
 
                 printf(_LIMPIAR "\e[?25l");
@@ -184,8 +183,6 @@ int main() {
                                     pasos++;
                                 }
                                 break;
-
-                            default: printf("%c", c); break;
                             }
                         }
                         //Verifica si el jugador obtuvo una llave
@@ -201,21 +198,22 @@ int main() {
 
                         //Dibujar
                         ajustar_cursor(1, 1);
-                        dibujar_informacion(j, total_monedas);
+                        dibujar_informacion(j, total_monedas, nivel_act);
                         dibujar_mapa(mapa_cargado, ren, col, j);
 
                         espera(100);
                     }
                     long new_puntaje = calcular_puntuaje(j.monedas, j.cant_pasos, nivel_act);
 
+                    total_final_monedas += total_monedas;
                     j.total_monedas += j.monedas;
                     j.puntaje += new_puntaje;
                     j.cant_pasos += pasos;
 
                     ajustar_cursor(1, 1);
-                    dibujar_informacion(j, total_monedas);
+                    dibujar_informacion(j, total_monedas, nivel_act);
                     dibujar_resultados(mapa_cargado,
-j, total_monedas,
+                        j, total_monedas,
                         new_puntaje,
                         celdas_libres(mapa_cargado, ren, col),
                         pasos
@@ -226,11 +224,13 @@ j, total_monedas,
                 }
                 else {
                     mapa = false;
+                    dibujar_informacion(j, total_monedas, nivel_act);
+                    dibujar_final(j, total_final_monedas, nivel_act);
+                    _getch();
                 }
             } while (mapa);
-            printf("No hay mas mapas\n");
 
-            espera(3000);
+            espera(1000);
             break;
         case 2:
             printf(CYAN "Has seleccionado la Opción 2\n" RESET);
@@ -284,16 +284,16 @@ void imprimir_acercade_1() {
     
     // Objetivo del juego
     printf("\n" MORADO "OBJETIVO:" YELLOW " Recorrer el mapa, recolectar monedas,\n encontrar la llave y llegar a la salida.\n" RESET);
-    printf("\n" MORADO "ELEMENTOS DEL MAPA:\n" GREEN "[SIMBOLO]" MORADO ":" RESET " SIGNIFICADO.\n");
+    printf("\n" MORADO "ELEMENTOS DEL MAPA EN TEXTO:\n" GREEN "[SIMBOLO]" MORADO ":" RESET " SIGNIFICADO.\n");
 
     // Simbología del juego
-    printf("\n" VERDE "[" AZUL_B "#" VERDE "]" MORADO ":" RESET " Pared, no se puede pasar.");
-    printf("\n" VERDE "[" GRIS "." VERDE "]" MORADO ":" RESET " Camino libre, transitable.");
-    printf("\n" VERDE "[" WHITE "P" VERDE "]" MORADO ":" RESET " Personaje.");
-    printf("\n" VERDE "[" YELLOW_B "M" VERDE "]" MORADO ":" RESET " Moneda.");
-    printf("\n" VERDE "[" GRIS "K" VERDE "]" MORADO ":" RESET " Llave.");
-    printf("\n" VERDE "[" AZUL_B "D" VERDE "]" MORADO ":" RESET " Puerta, requiere llave.");
-    printf("\n" VERDE "[" RED "E" VERDE "]" MORADO ":" RESET " Salida, terminar el nivel.\n\n\n");
+    printf("\n" VERDE "[" AZUL_B "#" VERDE "][" WHITE "%c%c" VERDE "]" MORADO ":" RESET " Pared, no se puede pasar.", 219, 219);
+    printf("\n" VERDE "[" GRIS "." VERDE "][  ]" MORADO ":" RESET " Camino libre, transitable.");
+    printf("\n" VERDE "[" WHITE "P" VERDE "][" WHITE "()" VERDE "]" MORADO ":" RESET " Personaje.");
+    printf("\n" VERDE "[" YELLOW_B "M" VERDE "][" _RGB(255, 192, 128) "$ " VERDE "]" MORADO ":" RESET " Moneda.");
+    printf("\n" VERDE "[" GRIS "K" VERDE "][" _RGB(192, 192, 224) "O%c" VERDE "]" MORADO ":" RESET " Llave.", 170);
+    printf("\n" VERDE "[" AZUL_B "D" VERDE "][" _RGB(255, 170, 90) _FRGB(175, 95, 20) " %c" RESET VERDE "]" MORADO ":" RESET " Puerta, requiere llave.", 170);
+    printf("\n" VERDE "[" RED "E" VERDE "][" _RGB(0,0,0) _FRGB(250, 55, 15) "[]" RESET VERDE "]" MORADO ":" RESET " Salida, terminar el nivel.\n\n\n");
 }
 
 void imprimir_acercade_2(){

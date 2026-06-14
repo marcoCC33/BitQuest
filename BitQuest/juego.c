@@ -36,8 +36,8 @@ void imprimir_objeto(char caracter, float oscuro) {
         break;
 
     case 'M':
-        color_rgb(192 * oscuro, 128 * oscuro, 32 * oscuro);
-        printf("$ ", 184);
+        color_rgb(255 * oscuro, 192 * oscuro, 128 * oscuro);
+        printf("$ ");
         break;
 
     case 'K':
@@ -140,10 +140,17 @@ void dibujar_mapa(char** mapa, int ren, int col, Jugador j) {
     printf("%c\n", 188);
 }
 
-void dibujar_informacion(Jugador j, int max_coins) {
+void dibujar_informacion(Jugador j, int max_coins, int nivel) {
     fondo_rgb(16, 48, 24);
     color_rgb(8, 255, 32);
-    printf(_CONSOLA(3m) " $ ");
+
+    printf(_CONSOLA(3m));
+    for (int i = 17; i > 0; i--) printf(" ");
+    printf("NIVEL %d", nivel);
+    for (int i = 18; i > 0 && pow(10, i) > nivel; i--) printf(" ");
+    printf("\n");
+
+    printf(" $ ");
     //Dibujar monedas sin romper el diseño
     if (j.monedas < 10)         printf("   %d", j.monedas);
     else if (j.monedas < 100)   printf("  %d", j.monedas);
@@ -216,13 +223,29 @@ void dibujar_resultados(char** mapa, Jugador j, int max_coins, int puntuacion, i
             printf("          << FIN DEL NIVEL >>           ");
         }
         //CANTIDAD DE PASOS
-        else if (x == MAX_VISIBLE_X / 2 - 3) {
+        else if (x == MAX_VISIBLE_X / 2 - 4) {
             printf("        Cantidad de pasos: %d", pasos);
 
             //Imprime la cantidad necesaria de espacios
             for (int i = 12; i > 0 && pow(10, i) > pasos; i--) {
                 printf(" ");
             }
+        }
+        //TOTAL DE MONEDAS CONSEGUIDAS
+        else if (x == MAX_VISIBLE_X / 2 - 3) {
+            bool monedas_cero = false;
+            printf("      Monedas conseguidas: %d/ %d", j.monedas, max_coins);
+            if (j.monedas == 0) {
+                j.monedas = 1;
+                monedas_cero = true;
+            }
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 9; i > 0 && pow(10, i) > j.monedas * max_coins; i--) {
+                printf(" ");
+            }
+
+            if (monedas_cero) j.monedas = 0;
         }
         //PORCENTAJE DE MONEDAS RECOLECTADAS
         else if (x == MAX_VISIBLE_X / 2 - 2) {
@@ -267,7 +290,7 @@ void dibujar_resultados(char** mapa, Jugador j, int max_coins, int puntuacion, i
         }
         //PUNTAJE TOTAL
         else if (x == MAX_VISIBLE_X / 2 + 4) {
-            printf("        Puntuacion actual: %d", j.puntaje);
+            printf("         Puntuacion total: %d", j.puntaje);
 
             //Imprime la cantidad necesaria de espacios
             for (int i = 12; i > 0 && pow(10, i) > j.puntaje; i--) {
@@ -282,6 +305,118 @@ void dibujar_resultados(char** mapa, Jugador j, int max_coins, int puntuacion, i
         else {
             for (int y = 0; y < MAX_VISIBLE_Y; y++) {
                 imprimir_objeto(mapa[x][y], 0.45);
+            }
+        }
+        //Marco derecho
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+        //Salto de línea sin dibujar de más
+        color_rgb(255, 255, 255);
+        fondo_rgb(0, 0, 0);
+        printf("\n");
+    }
+
+    //Marco inf tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 200);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 188);
+}
+
+void dibujar_final(Jugador j, int max_coins, int nivel) {
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+
+    //Marcos tipo matrix
+    fondo_rgb(16, 48, 24);
+    color_rgb(8, 255, 32);
+    printf("%c", 201);
+    for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+        printf("%c%c", 205, 205);
+    }
+    printf("%c\n", 187);
+
+    for (int x = 0; x < MAX_VISIBLE_X; x++) {
+        //Marco izquierdo
+        fondo_rgb(16, 48, 24);
+        color_rgb(8, 255, 32);
+        printf("%c", 186);
+
+        //Títulos
+        if (x == 3) {
+            printf("          << FIN DEL JUEGO >>           ");
+        }
+        //TOTAL DE MONEDAS CONSEGUIDAS
+        else if (x == MAX_VISIBLE_X / 2 - 3) {
+            bool monedas_cero = false;
+            printf("          Monedas totales: %d/ %d", j.total_monedas, max_coins);
+            if (j.total_monedas == 0) {
+                j.total_monedas = 1;
+                monedas_cero = true;
+            }
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 9; i > 0 && pow(10, i) > j.total_monedas * max_coins; i--) {
+                printf(" ");
+            }
+
+            if (monedas_cero) j.total_monedas = 0;
+        }
+        //PORCENTAJE DE MONEDAS RECOLECTADAS
+        else if (x == MAX_VISIBLE_X / 2 - 2) {
+            float relacion = 0;
+            //Evita explosiones
+            if (max_coins > 0) {
+                relacion = (float)(j.total_monedas) / max_coins * 100;
+            }
+            printf("      Relacion de monedas: %.2f%%", relacion);
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 8; i > 0 && pow(10, i) > relacion; i--) {
+                printf(" ");
+            }
+        }
+        //CANTIDAD DE PASOS
+        else if (x == MAX_VISIBLE_X / 2 - 1) {
+            printf("        Cantidad de pasos: %d", j.cant_pasos);
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 12; i > 0 && pow(10, i) > j.cant_pasos; i--) {
+                printf(" ");
+            }
+        }
+        //TOTAL DE NIVELES
+        else if (x == MAX_VISIBLE_X / 2) {
+            printf("      Niveles completados: %d", nivel);
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 12; i > 0 && pow(10, i) > nivel; i--) {
+                printf(" ");
+            }
+        }
+        //PUNTAJE TOTAL
+        else if (x == MAX_VISIBLE_X / 2 + 1) {
+            printf("         Puntuacion total: %d", j.puntaje);
+
+            //Imprime la cantidad necesaria de espacios
+            for (int i = 12; i > 0 && pow(10, i) > j.puntaje; i--) {
+                printf(" ");
+            }
+        }
+        //MENSAJE CONTINUAR
+        else if (x == MAX_VISIBLE_X - 3) {
+            printf("  [PRESIONA UNA TECLA PARA CONTINUAR]   ");
+        }
+        //Dibujado
+        else {
+            for (int y = 0; y < MAX_VISIBLE_Y; y++) {
+                color_rgb(0, 0, 0);
+                fondo_rgb(0, 0, 0);
+                printf("  ");
             }
         }
         //Marco derecho
