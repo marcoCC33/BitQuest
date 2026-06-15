@@ -218,6 +218,12 @@ int main() {
                         celdas_libres(mapa_cargado, ren, col),
                         pasos
                     );
+
+                    for (int x = 0; x < ren; x++) {
+                        free(mapa_cargado[x]);
+                    }
+                    free(mapa_cargado);
+
                     _getch();
 
                     nivel_act++;
