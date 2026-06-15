@@ -98,10 +98,10 @@ verificar_jugador:
     ;Se encuentra con un puerta, si hay llaves se deja pasar, si no, nel
 .puerta:
     mov r10, [rsp + 40]     ; Recupera la cantidad de llaves
-    cmp [r10], 0
+    cmp dword [r10], 0
     jle .bloqueado
     mov eax, 1              ; Se mueve
-    dec [r10]               ; Reduce la cantidad de llaves
+    dec dword [r10]               ; Reduce la cantidad de llaves
     ret
 
 .bloqueado:
@@ -284,7 +284,7 @@ encontrar_jugador:
     mov     [r9 + 4], r12
 
     ;limpia el resto de variables
-    mov     [r9 + 8], 0     ;monedas
-    mov     [r9 + 16], 0    ;llaves
+    mov     dword [r9 + 8], 0     ;monedas
+    mov     dword [r9 + 16], 0    ;llaves
 
     ret
