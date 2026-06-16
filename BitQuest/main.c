@@ -137,10 +137,10 @@ int main() {
                             case 'p': printf(_LIMPIAR); break;
 
                             case 'w':
-                                if (verificar_jugador(mapa_cargado, col, j.x - 1, j.y, &j.llaves)) {
-                                    completado = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'E');
-                                    llave = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'K');
-                                    moneda = verificar_objeto(mapa_cargado, ren, j.x - 1, j.y, 'M');
+                                if (verificar_jugador(mapa_cargado, j.x - 1, j.y, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, j.x - 1, j.y, 'E');
+                                    llave = verificar_objeto(mapa_cargado, j.x - 1, j.y, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, j.x - 1, j.y, 'M');
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x - 1, j.y);
                                     j.x -= 1;
@@ -149,10 +149,10 @@ int main() {
                                 break;
 
                             case 'a':
-                                if (verificar_jugador(mapa_cargado, col, j.x, j.y - 1, &j.llaves)) {
-                                    completado = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'E');
-                                    llave = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'K');
-                                    moneda = verificar_objeto(mapa_cargado, ren, j.x, j.y - 1, 'M');
+                                if (verificar_jugador(mapa_cargado, j.x, j.y - 1, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, j.x, j.y - 1, 'E');
+                                    llave = verificar_objeto(mapa_cargado, j.x, j.y - 1, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, j.x, j.y - 1, 'M');
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y - 1);
                                     j.y -= 1;
@@ -161,10 +161,10 @@ int main() {
                                 break;
 
                             case 's':
-                                if (verificar_jugador(mapa_cargado, col, j.x + 1, j.y, &j.llaves)) {
-                                    completado = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'E');
-                                    llave = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'K');
-                                    moneda = verificar_objeto(mapa_cargado, ren, j.x + 1, j.y, 'M');
+                                if (verificar_jugador(mapa_cargado, j.x + 1, j.y, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, j.x + 1, j.y, 'E');
+                                    llave = verificar_objeto(mapa_cargado, j.x + 1, j.y, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, j.x + 1, j.y, 'M');
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x + 1, j.y);
                                     j.x += 1;
@@ -173,10 +173,10 @@ int main() {
                                 break;
 
                             case 'd':
-                                if (verificar_jugador(mapa_cargado, col, j.x, j.y + 1, &j.llaves)) {
-                                    completado = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'E');
-                                    llave = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'K');
-                                    moneda = verificar_objeto(mapa_cargado, ren, j.x, j.y + 1, 'M');
+                                if (verificar_jugador(mapa_cargado, j.x, j.y + 1, &j.llaves)) {
+                                    completado = verificar_objeto(mapa_cargado, j.x, j.y + 1, 'E');
+                                    llave = verificar_objeto(mapa_cargado, j.x, j.y + 1, 'K');
+                                    moneda = verificar_objeto(mapa_cargado, j.x, j.y + 1, 'M');
 
                                     mover_jugador(mapa_cargado, j.x, j.y, j.x, j.y + 1);
                                     j.y += 1;
@@ -219,11 +219,15 @@ int main() {
                         pasos
                     );
 
+                    //Limpieza de memoria
                     for (int x = 0; x < ren; x++) {
                         free(mapa_cargado[x]);
                     }
                     free(mapa_cargado);
-
+                    
+                    espera(1000);
+                    //Limpiar de forma bruta el buffer
+                    while (_kbhit()) _getch();
                     _getch();
 
                     nivel_act++;

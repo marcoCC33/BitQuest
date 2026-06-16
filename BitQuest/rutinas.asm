@@ -62,29 +62,26 @@ cantidad_caracter:
 ; C prototipo: int verificar_jugador(char** mapa, int col, int sig_x, int sig_y);
 ; Parámetros:
 ;   RCX = char** mapa
-;   RDX = int col         (Columnas totales de la matriz, para validación)
-;   R8  = int sig_x       (Fila propuesta)
-;   R9  = int sig_y       (Columna propuesta)
-;   [RSP+40] = int* llave (5to parámetro guardado en la pila)
+;   RDX  = int sig_x       (Fila propuesta)
+;   R8  = int sig_y       (Columna propuesta)
+;   R9 = int* llave (5to parámetro guardado en la pila)
 ; ==============================================================================
 verificar_jugador:
+    XOR eax, eax
+
     ; Validar límites inferiores
+    cmp rdx, 0
+    jl .bloqueado
     cmp r8d, 0
     jl .bloqueado
-    cmp r9d, 0
-    jl .bloqueado
-    
-    ; Validar límites superiores de la columna usando RDX
-    cmp r9d, edx
-    jge .bloqueado
 
     ; Obtener la dirección base de la fila propuesta: mapa[sig_x]
-    mov r11, [rcx + r8 * 8]
+    mov r11, [rcx + rdx * 8]
     test r11, r11           ; Verificar que la fila exista en memoria
     jz .bloqueado
 
     ; Obtener el carácter de la celda destino: mapa[sig_x][sig_y]
-    mov al, byte [r11 + r9]
+    mov al, byte [r11 + r8]
 
     cmp al, '#'             ; Pared
     je .bloqueado
@@ -97,11 +94,11 @@ verificar_jugador:
 
     ;Se encuentra con un puerta, si hay llaves se deja pasar, si no, nel
 .puerta:
-    mov r10, [rsp + 40]     ; Recupera la cantidad de llaves
-    cmp dword [r10], 0
+    ; Recupera la cantidad de llaves
+    cmp dword [r9], 0
     jle .bloqueado
     mov eax, 1              ; Se mueve
-    dec dword [r10]               ; Reduce la cantidad de llaves
+    dec dword [r9]               ; Reduce la cantidad de llaves
     ret
 
 .bloqueado:
@@ -137,23 +134,18 @@ calcular_puntuaje:
 ; C prototipo: int verificar_objeto(char** mapa, int col, int x, int y, int obj);
 ; Parámetros:
 ;   RCX = char** mapa
-;   RDX = int col
-;   R8  = int x           (Coordenada Fila)
-;   R9  = int y           (Coordenada Columna)
-;   [RSP+40] = int obj    (5to parámetro guardado en la pila)
+;   RDX = int x           (Coordenada Fila)
+;   R8  = int y           (Coordenada Columna)
+;   R9  = int obj   
 ; ==============================================================================
 verificar_objeto:
     ; Obtener la dirección de la fila mapa[x]
-    mov r11, [rcx + r8 * 8]
-    test r11, r11
-    jz .no_es
+    mov r11, [rcx + rdx * 8]
 
     ; Cargar el carácter real de la celda mapa[x][y]
-    mov al, byte [r11 + r9]
+    mov al, byte [r11 + r8]
 
-    mov r10d, [rsp + 40]
-
-    cmp al, r10b            ; Caracter de la celda y el objetivo
+    cmp al, r9b            ; Caracter de la celda y el objetivo
     jne .no_es
 
     mov eax, 1              ; Sí es el objeto

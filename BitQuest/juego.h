@@ -46,10 +46,10 @@ void dibujar_final(Jugador j, int max_coins, int nivel);
 
 // funciones para  rutinas.ASM
 void encontrar_jugador(char** mapa, int ren, int col, Jugador* j);						// ASM Recibe una estructura Jugador y le guarda la posición de la primera 'P' que encuentra
-int verificar_jugador(char** mapa, int max_col, int sig_x, int sig_y, int* llave);		// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
+int verificar_jugador(char** mapa, int sig_x, int sig_y, int* llave);		// ASM (mapa, col (# max de col del mapa), sig_x, sig_y), regresa 1 o 0
 int cantidad_caracter(char** mapa, int ren, int col, int caracter);						// ASM (mapa, ren, col, caracter a buscar) - regresa la cantidad de caracteres encontrados
 int calcular_puntuaje(int monedas, int pasos, int nivel);								// ASM (monedas, pasos, niveles) - regresa puntuación final
-int verificar_objeto(char** mapa, int col, int x, int y, int caracter);					// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
+int verificar_objeto(char** mapa, int x, int y, int caracter);					// ASM (mapa, col, x, y, caracter a buscar) - regresa 1 o 0
 int celdas_libres(char** mapa, int ren, int col);										// ASM (mapa, ren, col) - regresa cuantos '.' hay
 void mover_jugador(char** mapa, int x1, int y1, int x2, int y2);						// ASM (movería al player)
 
