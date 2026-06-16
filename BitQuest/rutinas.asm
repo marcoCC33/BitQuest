@@ -62,9 +62,9 @@ cantidad_caracter:
 ; C prototipo: int verificar_jugador(char** mapa, int col, int sig_x, int sig_y);
 ; Parámetros:
 ;   RCX = char** mapa
-;   RDX  = int sig_x       (Fila propuesta)
+;   RDX  = int sig_x      (Fila propuesta)
 ;   R8  = int sig_y       (Columna propuesta)
-;   R9 = int* llave (5to parámetro guardado en la pila)
+;   R9 = int* llave       (Cantidad de llaves)
 ; ==============================================================================
 verificar_jugador:
     XOR eax, eax
